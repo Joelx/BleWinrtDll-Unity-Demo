@@ -110,9 +110,7 @@ public class BleTest : MonoBehaviour
         } catch(NullReferenceException e)
         {
             Debug.Log("Thread or object never initialized.\n" + e);
-        }
-
-        
+        }        
     }
 
     public void StartScanHandler()
@@ -164,7 +162,6 @@ public class BleTest : MonoBehaviour
             Debug.Log("no device found!");
             return;
         }
-
     }
 
     // Start establish BLE connection with
@@ -204,7 +201,4 @@ public class BleTest : MonoBehaviour
         }
         return result;
     }
-
 }
-
-
