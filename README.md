@@ -1,7 +1,7 @@
 # BleWinrtDll-Unity-Demo
 
 
-This is a small Unity demo project showing a exemplary implementation of the <a href="https://github.com/adabru/BleWinrtDll">BleWinrtDLL repository</a> by <a href="https://github.com/adabru">adabru</a>.
+This is a small Unity demo project showing an exemplary implementation of the <a href="https://github.com/adabru/BleWinrtDll">BleWinrtDLL repository</a> by <a href="https://github.com/adabru">adabru</a>.
 <br>
 Included is a simple Unity scene containing a GUI that lists scanned BLE devices and makes the connection to a BLE device accessible via button click. 
 <br>
