@@ -13,7 +13,7 @@ public class BleTest : MonoBehaviour
     string serviceUuid = "{2a2b1072-5199-11eb-ae93-0242ac130002}";
     string[] characteristicUuids = {
          "{59c2f246-5199-11eb-ae93-0242ac130002}",      // CUUID 1
-         "{617c753e-5199-11eb-ae93-0242ac130002}"        // CUUID 2
+         "{617c753e-5199-11eb-ae93-0242ac130002}"       // CUUID 2
     };
 
     BLE ble;
