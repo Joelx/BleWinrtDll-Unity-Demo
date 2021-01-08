@@ -7,6 +7,6 @@ Included is a simple Unity scene containing a GUI listing scanned BLE devices an
 <br>
 ## Instructions
 1. Download the project folder and import it as a new project in Unity Hub.
-2. In Unity, open the `BleTest` scene
-3. Hit "play" to start the GUI
+2. In Unity, open the `BleTest` scene.
+3. Hit "play" to start the GUI.
 4. If you want to connect a device, you first need to fill in the corresponding fields `targetDeviceName`, `serviceUuid` and `characteristicUuids` in the `BleTest.cs` file to match your BLE device.
