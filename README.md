@@ -3,7 +3,7 @@
 
 This is a small Unity demo project showing an exemplary implementation of the <a href="https://github.com/adabru/BleWinrtDll">BleWinrtDLL repository</a> by <a href="https://github.com/adabru">adabru</a>.
 <br>
-Included is a simple Unity scene containing a GUI that lists scanned BLE devices and makes the connection to a BLE device accessible via button click. 
+Included is a simple Unity scene containing a GUI listing scanned BLE devices and making the connection to a BLE device accessible via button click. 
 <br>
 ## Instructions
 1. Download the project folder and import it as a new project in Unity Hub.
