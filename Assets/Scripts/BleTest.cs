@@ -154,7 +154,7 @@ public class BleTest : MonoBehaviour
         while (deviceId == null)
             Thread.Sleep(500);
         scan.Cancel();
-        scanningThread.Abort();
+        scanningThread = null;
         isScanning = false;
 
         if (deviceId == "-1")
