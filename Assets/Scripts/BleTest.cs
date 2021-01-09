@@ -53,9 +53,10 @@ public class BleTest : MonoBehaviour
             }                
         } else
         {
-            if (!ButtonStartScan)
+            /* Restart scan in same play session not supported yet.
+            if (!ButtonStartScan.enabled)
                 ButtonStartScan.enabled = true;
-
+            */
             if (TextIsScanning.text != "Not scanning.")
             {
                 TextIsScanning.color = Color.white;
@@ -116,6 +117,7 @@ public class BleTest : MonoBehaviour
     {
         devicesCount = 0;
         isScanning = true;
+        discoveredDevices.Clear();
         scanningThread = new Thread(ScanBleDevices);
         scanningThread.Start();
         TextIsScanning.color = new Color(244, 180, 26);
