@@ -18,72 +18,71 @@ public class BleTest : MonoBehaviour
 
     BLE ble;
     BLE.BLEScan scan;
-    bool isScanning = false;
+    bool isScanning = false, isConnected = false;
     string deviceId = null;  
     IDictionary<string, string> discoveredDevices = new Dictionary<string, string>();
+    int devicesCount = 0;
 
     // BLE Threads 
     Thread scanningThread, connectionThread;
 
     // GUI elements
     public Text TextDiscoveredDevices, TextIsScanning, TextTargetDeviceConnection, TextTargetDeviceData;
-    public Button ButtonEstablishConnection;
+    public Button ButtonEstablishConnection, ButtonStartScan;
 
     // Start is called before the first frame update
     void Start()
     {
         ble = new BLE();
+        ButtonEstablishConnection.enabled = false;
+        TextTargetDeviceConnection.text = targetDeviceName + " not found.";
     }
 
     // Update is called once per frame
     void Update()
-    {
-  
+    {  
         if (isScanning)
         {
-            TextIsScanning.color = new Color(244, 180, 26);
-            TextIsScanning.text = "Scanning...";
-            TextDiscoveredDevices.text = "";
-            foreach (KeyValuePair<string, string> entry in discoveredDevices)
+            if (ButtonStartScan.enabled)
+                ButtonStartScan.enabled = false;
+
+            if (discoveredDevices.Count > devicesCount)
             {
-                TextDiscoveredDevices.text += "DeviceID: " + entry.Key + "\nDeviceName: " + entry.Value + "\n\n";
-                Debug.Log("Added device: " + entry.Key);
-            }
+                UpdateGuiText("scan");
+                devicesCount = discoveredDevices.Count;
+            }                
         } else
         {
-            TextIsScanning.color = Color.white;
-            TextIsScanning.text = "Not scanning.";
+            if (!ButtonStartScan)
+                ButtonStartScan.enabled = true;
+
+            if (TextIsScanning.text != "Not scanning.")
+            {
+                TextIsScanning.color = Color.white;
+                TextIsScanning.text = "Not scanning.";
+            }
         }
 
         // The target device was found.
         if (deviceId != null && deviceId != "-1")
         {
-            if (ble.isConnected)
+            // Target device is connected and GUI knows.
+            if (ble.isConnected && isConnected)
             {
-                ButtonEstablishConnection.enabled = false;
-                TextTargetDeviceConnection.text = "Connected to target device:\n" + targetDeviceName;
-
-                TextTargetDeviceData.text = "";
-                byte[] receivedPackage = BLE.ReadBytes();                
-                Debug.Log("Raw package: " + Encoding.ASCII.GetString(receivedPackage));                
-
-                // Example: Receiving int values from ESP32.
-                ulong endianConvertedData = ConvertLittleEndian(receivedPackage);
-                Debug.Log("Endian converted package: " + endianConvertedData);
-                TextTargetDeviceData.text += "Endian conv. data: \n" + endianConvertedData;
-                TextTargetDeviceData.text += "\n\nRaw data: \n" + Encoding.ASCII.GetString(receivedPackage);
-            } else
+                UpdateGuiText("writeData");
+            }
+            // Target device is connected, but GUI hasn't updated yet.
+            else if (ble.isConnected && !isConnected)
+            {
+                UpdateGuiText("connected");
+                isConnected = true;
+            // Device was found, but not connected yet. 
+            } else if (!ButtonEstablishConnection.enabled && !isConnected)
             {
                 ButtonEstablishConnection.enabled = true;
                 TextTargetDeviceConnection.text = "Found target device:\n" + targetDeviceName;
-            }
-            
-        } else
-        {
-            ButtonEstablishConnection.enabled = false;
-            TextTargetDeviceConnection.text = targetDeviceName + " not found.";
-        }
-
+            } 
+        } 
     }
 
     private void OnDestroy()
@@ -115,9 +114,13 @@ public class BleTest : MonoBehaviour
 
     public void StartScanHandler()
     {
+        devicesCount = 0;
         isScanning = true;
         scanningThread = new Thread(ScanBleDevices);
         scanningThread.Start();
+        TextIsScanning.color = new Color(244, 180, 26);
+        TextIsScanning.text = "Scanning...";
+        TextDiscoveredDevices.text = "";
     }
 
     public void ResetHandler()
@@ -129,6 +132,34 @@ public class BleTest : MonoBehaviour
         TextDiscoveredDevices.text = "No devices.";
         deviceId = null;
         CleanUp();
+    }
+
+    void UpdateGuiText(string action)
+    {
+        switch(action) {
+            case "scan":
+                TextDiscoveredDevices.text = "";
+                foreach (KeyValuePair<string, string> entry in discoveredDevices)
+                {
+                    TextDiscoveredDevices.text += "DeviceID: " + entry.Key + "\nDeviceName: " + entry.Value + "\n\n";
+                    Debug.Log("Added device: " + entry.Key);
+                }
+                break;
+            case "connected":
+                ButtonEstablishConnection.enabled = false;
+                TextTargetDeviceConnection.text = "Connected to target device:\n" + targetDeviceName;
+                break;
+            case "writeData":
+                TextTargetDeviceData.text = "";
+                byte[] receivedPackage = BLE.ReadBytes();
+                Debug.Log("Raw package: " + Encoding.ASCII.GetString(receivedPackage));
+                // Example: Receiving int values from ESP32.
+                ulong endianConvertedData = ConvertLittleEndian(receivedPackage);
+                Debug.Log("Endian converted package: " + endianConvertedData);
+                TextTargetDeviceData.text += "Endian conv. data: \n" + endianConvertedData;
+                TextTargetDeviceData.text += "\n\nRaw data: \n" + Encoding.ASCII.GetString(receivedPackage);
+                break;
+        }
     }
 
     void ScanBleDevices()
