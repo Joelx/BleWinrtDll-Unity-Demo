@@ -140,10 +140,9 @@ public class BleTest : MonoBehaviour
     {
         byte[] packageReceived = BLE.ReadBytes();
         // Convert little Endian.
-        Array.Reverse(packageReceived);
         // In this example we're interested about an angle
-        // value on the last field of our package.
-        remoteAngle = packageReceived[packageReceived.Length-1];
+        // value on the first field of our package.
+        remoteAngle = packageReceived[0];
         Debug.Log("Angle: " + remoteAngle);
         //Thread.Sleep(100);
     }
