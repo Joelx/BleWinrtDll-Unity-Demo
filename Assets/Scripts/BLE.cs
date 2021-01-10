@@ -237,13 +237,7 @@ public class BLE
             if (packageReceived.size > 512)
                 throw new ArgumentOutOfRangeException("Package too large.");
 
-            // Receiving uint8 values from µC.. 
-            // you might wanna change this 
-            // to match your data.
-            var data = new byte[packageReceived.size*8];
-            for (int i = 0; i < data.Length; i++)
-                data[i] = packageReceived.buf[i];
-            return data;
+            return packageReceived.buf;
         } else
         {
             return new byte[] { 0x0 };

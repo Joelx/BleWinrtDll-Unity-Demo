@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BleTest : MonoBehaviour
@@ -24,11 +22,12 @@ public class BleTest : MonoBehaviour
     int devicesCount = 0;
 
     // BLE Threads 
-    Thread scanningThread, connectionThread;
+    Thread scanningThread, connectionThread, readingThread;
 
     // GUI elements
     public Text TextDiscoveredDevices, TextIsScanning, TextTargetDeviceConnection, TextTargetDeviceData;
     public Button ButtonEstablishConnection, ButtonStartScan;
+    int remoteAngle, lastRemoteAngle;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +35,7 @@ public class BleTest : MonoBehaviour
         ble = new BLE();
         ButtonEstablishConnection.enabled = false;
         TextTargetDeviceConnection.text = targetDeviceName + " not found.";
+        readingThread = new Thread(ReadBleData);
     }
 
     // Update is called once per frame
@@ -136,6 +136,18 @@ public class BleTest : MonoBehaviour
         CleanUp();
     }
 
+    private void ReadBleData(object obj)
+    {
+        byte[] packageReceived = BLE.ReadBytes();
+        // Convert little Endian.
+        Array.Reverse(packageReceived);
+        // In this example we're interested about an angle
+        // value on the last field of our package.
+        remoteAngle = packageReceived[packageReceived.Length-1];
+        Debug.Log("Angle: " + remoteAngle);
+        //Thread.Sleep(100);
+    }
+
     void UpdateGuiText(string action)
     {
         switch(action) {
@@ -152,14 +164,16 @@ public class BleTest : MonoBehaviour
                 TextTargetDeviceConnection.text = "Connected to target device:\n" + targetDeviceName;
                 break;
             case "writeData":
-                TextTargetDeviceData.text = "";
-                byte[] receivedPackage = BLE.ReadBytes();
-                Debug.Log("Raw package: " + Encoding.ASCII.GetString(receivedPackage));
-                // Example: Receiving int values from ESP32.
-                ulong endianConvertedData = ConvertLittleEndian(receivedPackage);
-                Debug.Log("Endian converted package: " + endianConvertedData);
-                TextTargetDeviceData.text += "Endian conv. data: \n" + endianConvertedData;
-                TextTargetDeviceData.text += "\n\nRaw data: \n" + Encoding.ASCII.GetString(receivedPackage);
+                if (!readingThread.IsAlive)
+                {
+                    readingThread = new Thread(ReadBleData);
+                    readingThread.Start();
+                }
+                if (remoteAngle != lastRemoteAngle)
+                {
+                    TextTargetDeviceData.text = "Remote angle: " + remoteAngle;
+                    lastRemoteAngle = remoteAngle;
+                }
                 break;
         }
     }
