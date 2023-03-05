@@ -142,7 +142,7 @@ public class BLE
                 if (res.nameUpdated)
                 {
                     deviceIds.Add(res.id);
-                    deviceNames.Add(res.id, res.name);
+                    deviceNames.TryAdd(res.id, res.name);
                 }
                 // connectable device
                 if (deviceIds.Contains(res.id) && res.isConnectable)
